@@ -1,60 +1,40 @@
-pipeline{
+pipeline {
     agent any
-
-    environment{
-        PYTHON_ENV = 'venv'
-    }
-    //Stage 1 Clone the Repository
-    stages{
-        stage('checkout'){
-            steps{
-                echo 'Cloning repository...'
-                git branch: 'main',url : 'https://github.com/mithunsanjith5/my-python-app.git'
-
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from Git
+                git url: 'Your url' 
             }
         }
-        //Stage 2 : Set up the Python Environment
         stage('Setup Environment') {
-            steps{
-            echo 'Setting up Pyhton Virtual Environment...'
-            sh'''
-                Python3 -m venv ${PYTHON_ENV}
-                source ${PYTHON_ENV}/bin/active
-                pip install -r requirements.txt
-                '''
+            steps {
+                echo "Creating virtual environment..."
+                bat 'C:\\Users\\Windows\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m venv venv'  // Use double backslashes
+                echo "Activating virtual environment..."
+                bat 'call venv\\Scripts\\activate.bat'  // This line is fine as is
+                echo "Installing dependencies..."
+                bat 'C:\\Users\\Windows\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\pip.exe install -r requirements.txt'  // Use double backslashes
             }
         }
-        //Stage 3 : Run unit tests
-        stage('Run Test'){
-            steps{
-                echo 'Running unit tests...'
-                sh '''
-                    source ${PYTHON_ENV}/bin/activate
-                    pytest tests/
-                    '''
+        stage('Run Tests') {
+            steps {
+                echo "Running tests..."
+                // Add your testing commands here, for example:
+                // bat 'pytest'
             }
         }
-        //Stage 4 : Deploy (this could be to a local HTTP server,for example)
-        stage('Deploy'){
-            steps{
-                echo 'Deploying Applicaton...'
-                // In this example .we'll simulate delpyment by coping the code to a sever directory 
-                sh'''
-                cp -r* /path/to/local/http/server/root/ #Copy the app to  the  deployment finish
-                '''
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                // Add your deployment commands here
             }
         }
     }
-    post{
-        always{
-            echo ' Cleaning up workspace...'
-            cleanws()           //Clean teh pipeline after the pipeline finish
-        }
-        success{
-            echo 'Pipeline competed successfully'
-        }
-        failure{
-            echo 'Pipeline failed'
-        }
-    }
+    post {
+        always {
+            echo "Cleaning up workspace..."
+            cleanWs()
+        }
+    }
 }
